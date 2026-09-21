@@ -24,7 +24,7 @@ Do not commit credentials or environment files to this repository.
 Specify the directory containing the rules to evaluate.
 
 ```sh
-pnpm cli rule-review check --rules /path/to/project/agents/rules
+pnpm cli rule-review check --rules /path/to/rules
 ```
 
 `--rules` reads `.md` files directly inside the given directory.
@@ -37,7 +37,7 @@ You can also run the CLI from another working directory.
 
 ```sh
 /path/to/jev-plugins/node_modules/.bin/tsx /path/to/jev-plugins/src/cli.ts rule-review check \
-  --rules ./agents/rules
+  --rules ./rules
 ```
 
 ## Checks
@@ -49,8 +49,9 @@ You can also run the CLI from another working directory.
 
 Evaluations are nondeterministic, and findings are intended for human review.
 They are not security audits or guarantees that the rules are correct or complete.
-Rule pairs are selected using the existing `root`, `api`, `web`, and `other` scope categories.
-This does not perform exact overlap analysis for arbitrary glob patterns.
+Every unique pair of rules is evaluated, regardless of file names or project layout.
+Scope metadata is passed to the model; the CLI does not filter pairs by directory names or glob patterns.
+For n rule files, the cross-rule check evaluates n × (n − 1) / 2 pairs.
 
 Evaluations send rule bodies, metadata, and the bundled questions to an external API.
 The plugin reads the rules and outputs results without modifying them.
@@ -68,7 +69,7 @@ This plugin contains its command definitions, evaluation logic, and question def
 - `src/execute.ts` coordinates input loading, evaluation, and reporting, and determines the exit code.
 - `src/questions.ts` loads and validates the bundled question YAML files.
 - `src/rules.ts` reads rule Markdown files and their metadata.
-- `src/tasks.ts` compares rule scopes and builds single-rule and rule-pair tasks, including the text sent to Jev.
+- `src/tasks.ts` builds single-rule and rule-pair tasks, including the text sent to Jev.
 - `src/evaluate.ts` runs one evaluation through the AI SDK.
 - `src/report.ts` classifies the results and converts them into the shared `Report` type.
 

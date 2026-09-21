@@ -13,7 +13,7 @@ Set `AI_GATEWAY_API_KEY` to run evaluations.
 pnpm install --frozen-lockfile
 pnpm cli --help
 pnpm cli rule-review --help
-pnpm cli rule-review check --rules /path/to/project/agents/rules
+pnpm cli rule-review check --rules /path/to/rules
 ```
 
 ## Plugins

@@ -17,7 +17,10 @@ test("checks use fixed settings, classify responses, continue after errors and n
     globalThis.AI_SDK_DEFAULT_PROVIDER = previousProvider;
     await rm(rules, { recursive: true, force: true });
   });
-  for (const id of ["a", "b", "c", "d"]) await writeFile(join(rules, `${id}.md`), id);
+  // Different scopes must not exclude pairs, including formerly special-cased names.
+  for (const [id, scope] of [["a", "api"], ["b", "web"], ["c", "worker"], ["d", "docs"]]) {
+    await writeFile(join(rules, `${id}.md`), `---\nsubprojectPath: ${scope}\nglobs: ${scope}/**\n---\n${id}`);
+  }
   const definitions = await loadQuestions();
   let active = 0, maxActive = 0, requests = 0, fail = true;
   const model = new EvaluationMockModelV4({ doEvaluate: async ({ state, questions }) => {

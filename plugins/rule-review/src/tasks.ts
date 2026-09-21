@@ -12,19 +12,6 @@ export function createTasks(questions: QuestionDefinition[], rules: Rule[]): Tas
   );
 }
 
-function area(rule: Rule): "root" | "api" | "web" | "other" {
-  if (rule.id === "_root" || rule.globs.includes("**/*")) return "root";
-  if (rule.subprojectPath === "api" || rule.globs.includes("api/")) return "api";
-  if (rule.subprojectPath === "web" || rule.globs.includes("web/")) return "web";
-  return "other";
-}
-
-function scopesMayOverlap(left: Rule, right: Rule): boolean {
-  const leftArea = area(left);
-  const rightArea = area(right);
-  return leftArea === "root" || rightArea === "root" || leftArea === rightArea;
-}
-
 function ruleState(rule: Rule): string {
   return [
     "# Metadata",
@@ -45,7 +32,6 @@ function subjectsFor(check: QuestionDefinition, rules: Rule[]) {
   return rules.flatMap((left, leftIndex) =>
     rules
       .slice(leftIndex + 1)
-      .filter((right) => scopesMayOverlap(left, right))
       .map((right) => ({
         id: `${left.id}\u0000${right.id}`,
         label: `${left.file} x ${right.file}`,
