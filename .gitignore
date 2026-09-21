@@ -1,0 +1,5 @@
+node_modules/
+.jev/
+.env
+.env.*
+*.tsbuildinfo
