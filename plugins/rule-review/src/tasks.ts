@@ -17,7 +17,7 @@ function ruleState(rule: Rule): string {
     "# Metadata",
     `id: ${rule.id}`,
     `description: ${rule.description || "(none)"}`,
-    `globs: ${rule.globs || "(none)"}`,
+    `globs: ${rule.globs.length ? JSON.stringify(rule.globs) : "(none)"}`,
     `subprojectPath: ${rule.subprojectPath ?? "(none)"}`,
     "",
     "# Body",
