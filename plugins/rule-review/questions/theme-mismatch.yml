@@ -6,8 +6,8 @@ question: >-
   When the normative instructions in the body are classified by design concern, does any instruction address a different concern
   that cannot be inferred from the description and the main heading?
 criteria:
-  true: There is an instruction addressing a different concern that cannot be inferred from the stated topic.
-  false: All instructions belong to a single topic that can be inferred from the description and the main heading.
+  true: There is an instruction outside the scope stated in the description and main heading that is not a supporting detail needed to fulfill that scope.
+  false: All instructions fall within the scope stated in the description and main heading, or are supporting details needed to fulfill that scope.
 note: >-
   Supporting details or examples needed to carry out the stated topic do not count as a different concern.
   Ambiguity or contradictions between instructions about the same topic do not count as a topic mismatch.
