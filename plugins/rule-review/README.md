@@ -33,6 +33,17 @@ The model is `typesafe-ai/jev`, with a concurrency limit of 4.
 Results are written to stdout for the calling agent to consume.
 API error details are written to stderr.
 
+To check only the rules you added or changed, pass them with `--target`.
+
+```sh
+pnpm cli rule-review check --rules /path/to/rules --target new-rule.md changed-rule.md
+```
+
+Targets are matched by file name inside `--rules`, so paths such as `agents/rules/new-rule.md` also work.
+Single-rule checks run only for the targets, and cross-rule checks run only for pairs that include a target.
+For t targets among n rules, the cross-rule check evaluates n × (n − 1) / 2 − (n − t) × (n − t − 1) / 2 pairs.
+A target that is not in `--rules` is an input error.
+
 You can also run the CLI from another working directory.
 
 ```sh
@@ -49,9 +60,9 @@ You can also run the CLI from another working directory.
 
 Evaluations are nondeterministic, and findings are intended for human review.
 They are not security audits or guarantees that the rules are correct or complete.
-Every unique pair of rules is evaluated, regardless of file names or project layout.
+Without `--target`, every unique pair of rules is evaluated, regardless of file names or project layout.
 Scope metadata is passed to the model; the CLI does not filter pairs by directory names or glob patterns.
-For n rule files, the cross-rule check evaluates n × (n − 1) / 2 pairs.
+For n rule files without `--target`, the cross-rule check evaluates n × (n − 1) / 2 pairs.
 
 Evaluations send rule bodies, metadata, and the bundled questions to an external API.
 The plugin reads the rules and outputs results without modifying them.

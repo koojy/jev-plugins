@@ -16,10 +16,10 @@ function run(args: string[], cwd?: string, provider?: string) {
   return result;
 }
 
-test("help lists only the rules option and built-in help without API credentials", () => {
+test("help lists only the rules and target options and built-in help without API credentials", () => {
   const result = run(["rule-review", "check", "--help"]);
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual([...result.stdout.matchAll(/^\s+.*?(--[\w-]+)/gm)].map((match) => match[1]), ["--rules", "--help"]);
+  assert.deepEqual([...result.stdout.matchAll(/^\s+.*?(--[\w-]+)/gm)].map((match) => match[1]), ["--rules", "--target", "--help"]);
 });
 
 test("invalid commands and removed options fail before execution", () => {
@@ -64,6 +64,10 @@ test("CLI uses bundled questions from another directory and writes no files", as
   }
   await mkdir(join(cwd, "empty"));
   assert.equal(run(["rule-review", "check", "--rules", "empty"], cwd).status, 2);
+  const unknownTarget = run(["rule-review", "check", "--rules", "rules", "--target", "third.md"], cwd, provider);
+  assert.equal(unknownTarget.status, 1);
+  assert.match(unknownTarget.stderr, /Target rules not found in rules: third\.md/);
+  assert.equal(unknownTarget.stdout, "");
   const missing = run(["rule-review", "check", "--rules", "missing"], cwd);
   assert.equal(missing.status, 1);
   assert.match(missing.stderr, /ENOENT/);

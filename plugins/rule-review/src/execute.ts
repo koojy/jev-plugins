@@ -1,3 +1,4 @@
+import { basename } from "node:path";
 import { Readable } from "node:stream";
 import { loadQuestions } from "./questions.js";
 import { loadRules } from "./rules.js";
@@ -7,9 +8,14 @@ import { createReport } from "./report.js";
 import { printReport } from "../../../src/report.js";
 import { logger } from "../../../src/logger.js";
 
-export async function execute(rulesDir: string): Promise<number> {
+export async function execute(rulesDir: string, targetFiles?: string[]): Promise<number> {
   const [questions, rules] = await Promise.all([loadQuestions(), loadRules(rulesDir)]);
-  const tasks = createTasks(questions, rules);
+  const targets = targetFiles && new Set(targetFiles.map((file) => basename(file)));
+  const missing = [...(targets ?? [])].filter((file) => !rules.some((rule) => rule.file === file));
+  if (missing.length > 0) {
+    throw new Error(`Target rules not found in ${rulesDir}: ${missing.join(", ")}`);
+  }
+  const tasks = createTasks(questions, rules, targets);
   if (tasks.length === 0) {
     logger.error("No applicable checks or input documents. Nothing was checked.");
     return 2;

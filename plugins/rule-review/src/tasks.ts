@@ -6,9 +6,11 @@ export interface Task {
   subject: { id: string; label: string; state: string };
 }
 
-export function createTasks(questions: QuestionDefinition[], rules: Rule[]): Task[] {
+// Without targets every rule and pair is checked; with targets only those rules and pairs including one.
+export function createTasks(questions: QuestionDefinition[], rules: Rule[], targets?: ReadonlySet<string>): Task[] {
+  const isTarget = (rule: Rule) => !targets || targets.has(rule.file);
   return questions.flatMap((check) =>
-    subjectsFor(check, rules).map((subject) => ({ check, subject })),
+    subjectsFor(check, rules, isTarget).map((subject) => ({ check, subject })),
   );
 }
 
@@ -25,13 +27,14 @@ function ruleState(rule: Rule): string {
   ].join("\n");
 }
 
-function subjectsFor(check: QuestionDefinition, rules: Rule[]) {
+function subjectsFor(check: QuestionDefinition, rules: Rule[], isTarget: (rule: Rule) => boolean) {
   if (check.subject === "document") {
-    return rules.map((rule) => ({ id: rule.id, label: rule.file, state: ruleState(rule) }));
+    return rules.filter(isTarget).map((rule) => ({ id: rule.id, label: rule.file, state: ruleState(rule) }));
   }
   return rules.flatMap((left, leftIndex) =>
     rules
       .slice(leftIndex + 1)
+      .filter((right) => isTarget(left) || isTarget(right))
       .map((right) => ({
         id: `${left.id}\u0000${right.id}`,
         label: `${left.file} x ${right.file}`,

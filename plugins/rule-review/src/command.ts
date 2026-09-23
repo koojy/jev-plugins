@@ -6,8 +6,9 @@ export function registerRuleReview(program: Command): void {
     .command("check")
     .description("Check development rules using bundled question definitions")
     .requiredOption("--rules <directory>", "Markdown rule directory")
-    .action(async ({ rules }: { rules: string }) => {
+    .option("--target <file...>", "Check only these rule files and their pairs with every other rule")
+    .action(async ({ rules, target }: { rules: string; target?: string[] }) => {
       const { execute } = await import("./execute.js");
-      process.exitCode = await execute(rules);
+      process.exitCode = await execute(rules, target);
     });
 }

@@ -14,6 +14,7 @@ pnpm install --frozen-lockfile
 pnpm cli --help
 pnpm cli rule-review --help
 pnpm cli rule-review check --rules /path/to/rules
+pnpm cli rule-review check --rules /path/to/rules --target changed-rule.md
 ```
 
 ## Plugins

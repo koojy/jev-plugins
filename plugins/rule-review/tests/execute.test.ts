@@ -67,3 +67,31 @@ test("checks use fixed settings, classify responses, continue after errors and n
   assert.equal(errors.length, 0);
   assert.deepEqual((await readdir(rules)).sort(), ["a.md", "b.md", "c.md", "d.md"]);
 });
+
+test("targets limit document checks to targets and pairs to those including a target", async (t) => {
+  const rules = await mkdtemp(join(tmpdir(), "jev-target-"));
+  const previousProvider = globalThis.AI_SDK_DEFAULT_PROVIDER;
+  t.after(async () => {
+    globalThis.AI_SDK_DEFAULT_PROVIDER = previousProvider;
+    await rm(rules, { recursive: true, force: true });
+  });
+  for (const id of ["a", "b", "c", "d"]) await writeFile(join(rules, `${id}.md`), id);
+  const subjects: string[] = [];
+  const model = new EvaluationMockModelV4({ doEvaluate: async ({ state }) => {
+    subjects.push([...String(state).matchAll(/\nid: (\w+)\n/g)].map((match) => match[1]).join(""));
+    return { answers: { verdict: { type: "boolean", probability: 0 } }, warnings: [] };
+  } });
+  globalThis.AI_SDK_DEFAULT_PROVIDER = {
+    evaluationModel: () => model,
+  } as unknown as typeof previousProvider;
+  t.mock.method(process.stdout, "write", () => true);
+
+  // Paths resolve by file name, so callers can pass paths relative to their own directory.
+  assert.equal(await execute(rules, [join("agents", "rules", "b.md"), "d.md"]), 0);
+  assert.deepEqual(
+    [...new Set(subjects)].sort(),
+    ["ab", "b", "bc", "bd", "ad", "cd", "d"].sort(),
+  );
+  assert.equal(subjects.length, 3 * 2 + 5); // 3 document questions × 2 targets + 5 pairs.
+  await assert.rejects(execute(rules, ["missing.md"]), /Target rules not found in .*: missing\.md/);
+});
