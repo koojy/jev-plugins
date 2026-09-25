@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { logger } from "./logger.js";
+import { registerCloudAgentFit } from "../plugins/cloud-agent-fit/src/command.js";
 import { registerRuleReview } from "../plugins/rule-review/src/command.js";
 import { registerTicketGenre } from "../plugins/ticket-genre/src/command.js";
 import { registerTicketScope } from "../plugins/ticket-scope/src/command.js";
@@ -9,6 +10,7 @@ const program = new Command()
   .description("Jev checks for development workflows")
   .showHelpAfterError();
 
+registerCloudAgentFit(program);
 registerRuleReview(program);
 registerTicketGenre(program);
 registerTicketScope(program);

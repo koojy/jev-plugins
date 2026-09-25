@@ -23,6 +23,7 @@ pnpm cli ticket-genre check --request "$request"
 
 | Plugin | Purpose |
 | --- | --- |
+| [cloud-agent-fit](plugins/cloud-agent-fit/README.md) | Decide whether a completed ticket can go to a cloud coding agent. |
 | [rule-review](plugins/rule-review/README.md) | Check development rules for topic mismatches, ambiguity, and contradictions within or between rules. |
 | [ticket-genre](plugins/ticket-genre/README.md) | Decide the genre of a development request. |
 | [ticket-scope](plugins/ticket-scope/README.md) | Flag ticket draft items that go beyond the original request and the requester's answers. |
@@ -39,6 +40,7 @@ src/
   logger.ts
   report.ts
 plugins/
+  cloud-agent-fit/
   rule-review/
     README.md
     src/
