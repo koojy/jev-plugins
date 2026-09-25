@@ -1,6 +1,6 @@
 # Ticket Scope
 
-A Jev plugin that flags items in a ticket draft that go beyond the original request and the requester's answers.
+A Jev plugin that flags items in a ticket draft that go beyond the original request and the requester's answers, and items that prescribe how the work is implemented.
 
 ## Setup
 
@@ -59,14 +59,18 @@ An item necessarily follows only when any work that satisfies the request would 
 Extra behaviors, error cases, limits, defaults, concrete values or wording, and decisions the requester did not make count as additions, even when they are reasonable.
 Naming the target repository, base branch, or reference documents, running the repository's standard verification commands, and listing excluded work do not.
 
-The question is bundled in `questions/unrequested-requirement.yml`.
+Each item is also asked whether it prescribes how the work is implemented rather than the observable result, public contract, or constraint it must meet.
+Internal records or state, database tables or columns, module split, library selection, where a setting is stored, assigning internal work to the ticket, and the mechanism behind a behavior count as implementation details, even when the request describes them.
+Approved public contracts such as paths, operation names, request and response fields, status and error codes, and headers do not, and neither does saying that an existing system is left unchanged.
+
+The questions are bundled in `questions/unrequested-requirement.yml` and `questions/implementation-detail.yml`.
 The model is `typesafe-ai/jev`, with a concurrency limit of 4.
-One run makes one call per checked item.
+One run makes one call per checked item for each question.
 
 ## Report
 
 `Findings` lists items at or above the question's `at` probability, and `Borderline` lists items at or above `loose`.
-Each line shows the question ID, the item's line in the draft as `L12`, the probability, and the first line of the item, in draft order.
+Each line shows the question ID (`unrequested-requirement` or `implementation-detail`), the item's line in the draft as `L12`, the probability, and the first line of the item, in draft order.
 Items below `loose` are not listed.
 Evaluations that failed are listed under errors.
 

@@ -31,20 +31,27 @@ const draft = `対象リポジトリ: \`owner/repo\`。**PRは\`develop\`へ**�
 - \`pnpm test\`
 `;
 
-// Fixed responses exercise the script, not model accuracy. `answer` gives the probability for the item containing a text.
-async function setup(t: TestContext, answer: (state: string) => number) {
+// Fixed responses exercise the script, not model accuracy.
+// `answer` gives the unrequested-requirement probability and `implementation` the implementation-detail probability for an item.
+async function setup(t: TestContext, answer: (state: string) => number, implementation: (state: string) => number = () => 0) {
   const previousProvider = globalThis.AI_SDK_DEFAULT_PROVIDER;
   t.after(() => { globalThis.AI_SDK_DEFAULT_PROVIDER = previousProvider; });
-  const [definition] = await loadQuestions();
+  const definitions = await loadQuestions();
+  const definition = definitions.find((item) => item.id === "unrequested-requirement")!;
+  // `states` holds only the unrequested-requirement calls; `calls` holds every question.
   const states: string[] = [];
+  const calls: { id: string; state: string }[] = [];
   const model = new EvaluationMockModelV4({ doEvaluate: async ({ state, questions }) => {
-    states.push(String(state));
+    const current = definitions.find((item) => `${item.question}\n\n${item.note}` === questions.verdict.instructions);
+    assert.ok(current);
     assert.deepEqual(questions, { verdict: {
-      type: "boolean", instructions: `${definition.question}\n\n${definition.note}`, criteria: definition.criteria,
+      type: "boolean", instructions: `${current.question}\n\n${current.note}`, criteria: current.criteria,
     } });
+    calls.push({ id: current.id, state: String(state) });
+    if (current.id === definition.id) states.push(String(state));
     // Earlier items answer later, so the report order cannot follow completion order.
-    await delay(Math.max(0, 20 - states.length * 3));
-    const probability = answer(String(state));
+    await delay(Math.max(0, 20 - calls.length * 3));
+    const probability = current.id === definition.id ? answer(String(state)) : implementation(String(state));
     if (Number.isNaN(probability)) throw new Error("unavailable");
     return { answers: { verdict: { type: "boolean", probability } }, warnings: [] };
   } });
@@ -57,7 +64,7 @@ async function setup(t: TestContext, answer: (state: string) => number) {
   t.mock.method(process.stdout, "write", (chunk: string) => { stdout.push(chunk); return true; });
   t.mock.method(logger, "warn", (message: string) => { warnings.push(message); });
   t.mock.method(logger, "error", (message: string) => { errors.push(message); });
-  return { definition, states, stdout, warnings, errors };
+  return { definitions, definition, states, calls, stdout, warnings, errors };
 }
 
 test("each item outside skipped headings is checked against the request and reported in draft order", async (t) => {
@@ -74,6 +81,20 @@ test("each item outside skipped headings is checked against the request and repo
   assert.equal(stdout.join(""), [
     "", "Findings", "  unrequested-requirement L10 p=0.70 2. 保存に失敗したら「保存できませんでした」と3秒表示する",
     "", "Borderline", "  unrequested-requirement L11 p=0.50 3. 本文が空なら保存ボタンを押せない",
+    "", "Errors: 0", "",
+  ].join("\n"));
+});
+
+test("every item is also asked whether it prescribes an implementation, and those findings carry their own ID", async (t) => {
+  const { definitions, calls, stdout, errors } = await setup(t, () => 0, (state) => state.includes("3秒") ? 0.9 : 0);
+  assert.deepEqual(definitions.map((item) => item.id), ["implementation-detail", "unrequested-requirement"]);
+  assert.equal(await execute({ request, draft, skip: ["完了条件"] }), 0);
+  assert.equal(calls.filter((call) => call.id === "implementation-detail").length, 6);
+  assert.equal(calls.filter((call) => call.id === "unrequested-requirement").length, 6);
+  assert.deepEqual(errors, []);
+  assert.equal(stdout.join(""), [
+    "", "Findings", "  implementation-detail L10 p=0.90 2. 保存に失敗したら「保存できませんでした」と3秒表示する",
+    "", "Borderline", "  None",
     "", "Errors: 0", "",
   ].join("\n"));
 });

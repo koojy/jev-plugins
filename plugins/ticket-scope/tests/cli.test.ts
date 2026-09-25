@@ -53,6 +53,6 @@ test("CLI takes the texts and several skip headings as arguments and writes no f
   const args = ["ticket-scope", "check", "--request", "メモを保存できるようにしたい。", "--draft", draft, "--skip", "スコープ境界", "完了条件"];
   const result = run(args, cwd, provider);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout, "\nFindings\n  unrequested-requirement L3 p=1.00 メモを保存する\n\nBorderline\n  None\n\nErrors: 0\n");
+  assert.equal(result.stdout, "\nFindings\n  implementation-detail L3 p=1.00 メモを保存する\n  unrequested-requirement L3 p=1.00 メモを保存する\n\nBorderline\n  None\n\nErrors: 0\n");
   assert.deepEqual(await readdir(cwd), filesBefore);
 });
