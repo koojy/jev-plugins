@@ -16,6 +16,7 @@ pnpm cli rule-review --help
 pnpm cli rule-review check --rules /path/to/rules
 pnpm cli rule-review check --rules /path/to/rules --target changed-rule.md
 pnpm cli ticket-scope check --request "$request" --draft "$draft"
+pnpm cli ticket-genre check --request "$request"
 ```
 
 ## Plugins
@@ -23,6 +24,7 @@ pnpm cli ticket-scope check --request "$request" --draft "$draft"
 | Plugin | Purpose |
 | --- | --- |
 | [rule-review](plugins/rule-review/README.md) | Check development rules for topic mismatches, ambiguity, and contradictions within or between rules. |
+| [ticket-genre](plugins/ticket-genre/README.md) | Decide the genre of a development request. |
 | [ticket-scope](plugins/ticket-scope/README.md) | Flag ticket draft items that go beyond the original request and the requester's answers. |
 
 See each plugin's README and command `--help` for usage details.
@@ -44,6 +46,7 @@ plugins/
       execute.ts
     questions/
     tests/
+  ticket-genre/
   ticket-scope/
 tests/
 ```

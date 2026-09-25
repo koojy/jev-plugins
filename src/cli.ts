@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { logger } from "./logger.js";
 import { registerRuleReview } from "../plugins/rule-review/src/command.js";
+import { registerTicketGenre } from "../plugins/ticket-genre/src/command.js";
 import { registerTicketScope } from "../plugins/ticket-scope/src/command.js";
 
 const program = new Command()
@@ -9,6 +10,7 @@ const program = new Command()
   .showHelpAfterError();
 
 registerRuleReview(program);
+registerTicketGenre(program);
 registerTicketScope(program);
 
 try {
