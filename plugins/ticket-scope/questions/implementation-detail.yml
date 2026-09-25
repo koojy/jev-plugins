@@ -2,14 +2,15 @@ id: implementation-detail
 at: 0.70
 loose: 0.50
 question: >-
-  Does this item from a ticket draft prescribe how the work is implemented, rather than the observable result, public contract, or constraint the work must meet?
+  Does this item from a ticket draft prescribe how the work is implemented, rather than the result the users of the product observe or a constraint the work must meet?
 criteria:
-  true: The item fixes an internal implementation choice that another implementation could replace while still producing the same observable results, such as internal records or state, database tables or columns, module or component split, type placement, library or internal API selection, where configuration is stored, or the mechanism used to achieve a behavior.
-  false: The item states only observable behavior, a public contract, a constraint, or a decision about results, and any internal mechanism that meets it would satisfy the item.
+  true: The item fixes an implementation choice that another implementation could replace while still giving users the same results, such as API endpoints, paths, methods, request or response fields, status or error codes, operation or code identifiers, authentication schemes, internal records or state, database tables or columns, module or component split, which system or layer does the work, library selection, where configuration is stored, or the mechanism used to achieve a behavior.
+  false: The item states only what users of the product can do and observe, a constraint, or a decision about results, and any implementation that gives users those results would satisfy the item.
 note: >-
-  Observable results include what users see, what API callers receive, and what operators can see in logs or messages.
-  Public contracts the requester approved are not implementation details: endpoint paths and methods, operation names,
-  request and response fields and values, status and error codes, headers, and the external services the product integrates with.
+  Observable results are what the product's users see and can do, and what operators can see in logs or messages.
+  The shape of an API, such as its endpoints, fields, status codes, error codes, and headers, is an implementation detail in a ticket,
+  even when the requester approved it; the ticket states the behavior that shape serves.
+  Naming an external service the product already uses, such as a payment provider, is not an implementation detail.
   Naming the target repository, base branch, or reference documents, running the repository's standard verification commands,
   and listing work excluded from the scope are not implementation details;
   saying that an existing system is left unchanged or not yet connected only limits the scope.

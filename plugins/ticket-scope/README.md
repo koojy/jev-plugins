@@ -61,7 +61,7 @@ Naming the target repository, base branch, or reference documents, running the r
 
 Each item is also asked whether it prescribes how the work is implemented rather than the observable result, public contract, or constraint it must meet.
 Internal records or state, database tables or columns, module split, library selection, where a setting is stored, assigning internal work to the ticket, and the mechanism behind a behavior count as implementation details, even when the request describes them.
-Approved public contracts such as paths, operation names, request and response fields, status and error codes, and headers do not, and neither does saying that an existing system is left unchanged.
+API endpoints, fields, status codes, and error codes count too, because a ticket states the behavior they serve. Saying that an existing system is left unchanged does not.
 
 The questions are bundled in `questions/unrequested-requirement.yml` and `questions/implementation-detail.yml`.
 The model is `typesafe-ai/jev`, with a concurrency limit of 4.
