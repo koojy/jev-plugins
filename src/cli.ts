@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { logger } from "./logger.js";
 import { registerRuleReview } from "../plugins/rule-review/src/command.js";
+import { registerTicketScope } from "../plugins/ticket-scope/src/command.js";
 
 const program = new Command()
   .name("jev-plugins")
@@ -8,6 +9,7 @@ const program = new Command()
   .showHelpAfterError();
 
 registerRuleReview(program);
+registerTicketScope(program);
 
 try {
   if (process.argv.length === 2) program.help();
